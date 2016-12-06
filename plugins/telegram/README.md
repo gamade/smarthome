@@ -1,21 +1,26 @@
-# Telegram Plugin for smarthomeNG
+# My Plugin
 
 # Requirements
 
-Python Modules
-* telepot (8.3)
+List the requirements of your plugin. Does it need special software or hardware?
+
+## Supported Hardware
+
+* list
+* the
+* supported
+* hardware
 
 # Configuration
 
-Register your "Home-Bot" to Telegram:
-
 * Send command "/newbot" to "BotFather" in order to create your new bot
 * you will asked for a bot name and unique username 
-* BotFather will send you a token (=shard secred) you will need for plugin registration in plugin.conf
+* BotFather will send you a token (=shard secred) you will need for plugin registration
+* configure some bot details starting by sending "/mybots" to BotFather
 
 ## plugin.conf
 
-plugin.conf snippet for telegram plugin
+Please provide a plugin.conf snippet for your plugin with ever option your plugin supports. Optional attributes should be commented out.
 
 <pre>
 
@@ -27,27 +32,30 @@ plugin.conf snippet for telegram plugin
 
 </pre>
 
+Please provide a description of the attributes.
+This plugin needs an host attribute and you could specify a port attribute which differs from the default '1010'.
 
 ## items.conf
 
+List and describe the possible item attributes.
 
-### telegram_message 
+### my_attr
 
-Message text to broadcast if value changed
+Description of the attribute...
 
+### my_attr2
 
 ### Example
 
 Please provide an item configuration with every attribute and usefull settings.
 
-# items/my.conf
 <pre>
-[warnitem]
-	name = Warn Item xy
-	type = bool
-	eval_trigger = ...
-	telegram_message = "Windalarm!"
+# items/my.conf
 
+[someroom]
+    [[mydevice]]
+        type = bool
+        my_attr = setting
 </pre>
 
 ## logic.conf

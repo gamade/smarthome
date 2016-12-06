@@ -46,10 +46,17 @@ class Telegram(SmartPlugin):
     def __init__(self, smarthome, token='dummy', trusted_chat_ids='none'):
         self._sh = smarthome
         self.logger = logging.getLogger(__name__)
+
         self._bot = telepot.Bot(token)
         self.logger.info("Telegram bot is listening: {0}".format(self._bot.getMe()))
+
         self._bot.message_loop(self.message_handler)
-        self._chat_ids = trusted_chat_ids.split(',')
+
+        self._chat_ids = list(map(int, trusted_chat_ids.split(',')))
+
+        if len(self._chat_ids) < 1:
+            self.logger.info("No trusted chat ids configured!")
+        self._name = "GAMA HOME"
 
     # triggered by sh.telegram(msg)
     def __call__(self, msg):
@@ -101,7 +108,7 @@ class Telegram(SmartPlugin):
         tmp_chat_id = msg['chat']['id']
         command = msg['text']
 
-        self.logger.info("[%d] send command: %s" % (self._chat_id,  command))
+        self.logger.info("[%d] command received: %s" % (self._chat_id, command))
 
         # /roll: just a dummy to test interaction
         if command == '/roll':
@@ -113,7 +120,7 @@ class Telegram(SmartPlugin):
 
         # /help: show available commands als keyboard
         elif command == '/help':
-                self._bot.sendMessage(self._chat_id, "choose", reply_markup={"keyboard":[["/roll","/hide"], ["/time","/list"]]})
+	        self._bot.sendMessage(self._chat_id, "choose", reply_markup={"keyboard":[["/roll","/hide"], ["/time","/list"]]})
 
         # /hide: hide keyboard
         elif command == '/hide':
@@ -134,13 +141,12 @@ class Telegram(SmartPlugin):
                 self.logger.info("found [%d] in registered IDs" % (tmp_chat_id))
                 pos = self._chat_ids.index(tmp_chat_id)
             else:
-                self.logger.info("[%d] NOT found in registered IDs" % (tmp_chat_id))
-                pos = 0
-
-            if pos > 0: # registered chat_id
-                self._bot.sendMessage(tmp_chat_id, "Welcome at GAMA HOME!")
+                self.logger.info("[%d] NOT found in registered IDs: [%s]" % (tmp_chat_id, ''.join(map(str, self._chat_ids))))
+                pos = -1 
+            if pos >= 0: # registered chat_id
+                self._bot.sendMessage(tmp_chat_id, "Welcome at %s! Your are signed up already" % self._name)
             else:
-                self._bot.sendMessage(tmp_chat_id, "Welcome at GAMA HOME. Please register your ID: [%d]" % (tmp_chat_id))
+                self._bot.sendMessage(tmp_chat_id, "Welcome at %s. Please register your ID: [%d]" % (self._name, tmp_chat_id))
         elif command == '/test':
             self._bot.sendMessage(tmp_chat_id, "not implemented yet")
         else:
