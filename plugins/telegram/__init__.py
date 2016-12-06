@@ -30,8 +30,6 @@ import logging
 import telepot
 from lib.model.smartplugin import SmartPlugin
 
-logger = logging.getLogger('')
-
 PLUGIN_ATTR_TOKEN		= 'token'
 PLUGIN_ATTR_CHAT_IDS	= 'trusted_chat_ids'
 ITEM_ATTR_MESSAGE		= 'telegram_message'
@@ -47,8 +45,9 @@ class Telegram(SmartPlugin):
     # called, before items are loaded
     def __init__(self, smarthome, token='dummy', trusted_chat_ids='none'):
         self._sh = smarthome
+        self.logger = logging.getLogger(__name__)
         self._bot = telepot.Bot(token)
-        logger.info("Telegram bot is listening: {0}".format(self._bot.getMe()))
+        self.logger.info("Telegram bot is listening: {0}".format(self._bot.getMe()))
         self._bot.message_loop(self.message_handler)
         self._chat_ids = trusted_chat_ids.split(',')
 
@@ -70,7 +69,7 @@ class Telegram(SmartPlugin):
     # called for each item during startup, "item.conf" contains the attibute=value tuples
     def parse_item(self, item):
         if ITEM_ATTR_MESSAGE in item.conf:
-            logger.debug("parse item: {0}".format(item))
+            self.logger.debug("parse item: {0}".format(item))
             value = item.conf[ITEM_ATTR_MESSAGE]
             self._items.append(item)
             return self.update_item
@@ -85,11 +84,11 @@ class Telegram(SmartPlugin):
     # called each time an item changes.
     def update_item(self, item, caller=None, source=None, dest=None):
         if caller != 'smarthome-telegram':
-            logger.info("update item: {0}".format(item.id()))
+            self.logger.info("update item: {0}".format(item.id()))
 
         if ITEM_ATTR_MESSAGE in item.conf:
             msg = item.conf[ITEM_ATTR_MESSAGE]
-            logger.info("send Message: {}".format(msg))
+            self.logger.info("send Message: {}".format(msg))
             for cid in self._chat_ids:
                 self._bot.sendMessage(cid, msg)
 
@@ -102,7 +101,7 @@ class Telegram(SmartPlugin):
         tmp_chat_id = msg['chat']['id']
         command = msg['text']
 
-        logger.info("[%d] send command: %s" % (self._chat_id,  command))
+        self.logger.info("[%d] send command: %s" % (self._chat_id,  command))
 
         # /roll: just a dummy to test interaction
         if command == '/roll':
@@ -132,10 +131,10 @@ class Telegram(SmartPlugin):
         elif command == '/subscribe':
             tmp_chat_id = msg['chat']['id']
             if tmp_chat_id in self._chat_ids:
-                logger.info("found [%d] in registered IDs" % (tmp_chat_id))
+                self.logger.info("found [%d] in registered IDs" % (tmp_chat_id))
                 pos = self._chat_ids.index(tmp_chat_id)
             else:
-                logger.info("[%d] NOT found in registered IDs" % (tmp_chat_id))
+                self.logger.info("[%d] NOT found in registered IDs" % (tmp_chat_id))
                 pos = 0
 
             if pos > 0: # registered chat_id
