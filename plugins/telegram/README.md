@@ -1,4 +1,4 @@
-# My Plugin
+# Telegram Plugin for smarthomeNG
 
 # Requirements
 
