@@ -1,15 +1,10 @@
-# My Plugin
+# Telegram Plugin
+
+Send and receive information or commands over Telegram messaging service.  
 
 # Requirements
 
-List the requirements of your plugin. Does it need special software or hardware?
-
-## Supported Hardware
-
-* list
-* the
-* supported
-* hardware
+install telepot library (see requirements.txt)
 
 # Configuration
 
@@ -20,53 +15,79 @@ List the requirements of your plugin. Does it need special software or hardware?
 
 ## plugin.conf
 
-Please provide a plugin.conf snippet for your plugin with ever option your plugin supports. Optional attributes should be commented out.
-
 <pre>
 
 [telegram]
+        name = My Home
         class_name = Telegram
         class_path = plugins.telegram
-        token = "123456789:BBCCfd78dsf98sd9ds-_HJKShh4z5z4zh22"
+        token = 123456789:BBCCfd78dsf98sd9ds-_HJKShh4z5z4zh22
         trusted_chat_ids = 123456789,9876543210
 
 </pre>
 
-Please provide a description of the attributes.
-This plugin needs an host attribute and you could specify a port attribute which differs from the default '1010'.
+### name
+
+Visible name of the bot in hello messages
+
+### token
+
+shared secret to autheticte to telegram network
+
+### trusted_chad_ids
+
+Telegram communication is handled over chat(-channels) with unique ids. So a communication is bound to a chat id (=connected user) which can be adressed with broadcast messages. To get your current chat id, send a /subscribe command to the bot, which will replay with your chatid.  
 
 ## items.conf
 
-List and describe the possible item attributes.
+### telegram_message 
 
-### my_attr
+Send (broadcast) message on item change to registered chats. 
+It is possible to use placeholder tags in the message string, to use a template based communication.
 
-Description of the attribute...
+Available tags:
 
-### my_attr2
+[ID]
+[NAME]
+[VALUE]
+[CALLER]
+[SOURCE]
+[DEST]
 
-### Example
+### telegram_value_match_regex
 
-Please provide an item configuration with every attribute and usefull settings.
+In some cases it is usefull to check a value against a condition before sending the message. Messages are used to monitor defined value groups. Therefore messaging is limited with this attribute to matching regular expressions only.
+
+### Simple Example
 
 <pre>
-# items/my.conf
-
-[someroom]
-    [[mydevice]]
-        type = bool
-        my_attr = setting
+[doorbell]
+	name = Türklingel (entprellt)
+	type = bool
+	knx_dpt = 1
+	telegram_message = "Es klingelt an der Tür"
 </pre>
 
-## logic.conf
-If your plugin support item triggers as well, please describe the attributes like the item attributes.
+### Example with tags
 
+The following example shows an integration in AutoBlind.
+If the state changes, a message with the current state name is broadcasted 
 
-# Methodes
-If your plugin provides methods for logics. List and describe them here...
+<pre>
+[state_name]]
+        name = Name des aktuellen Zustands
+        type = str
+        visu_acl = r
+        cache = on
+        telegram_message = "New AutoBlind state: [VALUE]"
+</pre>
 
-## method1(param1, param2)
-This method enables the logic to send param1 and param2 to the device. You could call it with `sh.my.method1('String', 2)`.
+# Todo and feature requests
 
-## method2()
-This method does nothing.
+* The connection is resetted by the server time by time. Improve internal error handling, because the reset is not really an "error"
+* Implement full /subscribe meachanism to join broadcast messages
+* Implement codition based messaging. Messages are only sent, if a condition is fulfilled, e.g. a bool value is true. 
+* Implement interface to operationlog plugin for message broadcast
+* Implement fast and menu based (read-only) navigation through item-tree
+* Implement r/w access to items
+
