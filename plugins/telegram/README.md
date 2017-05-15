@@ -71,7 +71,7 @@ In some cases it is usefull to check a value against a condition before sending 
 ### Example with tags
 
 The following example shows an integration in AutoBlind.
-If the state changes, a message with the current state name is broadcasted 
+If the state changes, a message with the current state name is broadcasted.
 
 <pre>
 [state_name]]

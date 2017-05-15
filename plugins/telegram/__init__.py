@@ -32,6 +32,7 @@ import logging
 import urllib3
 import telepot
 import telepot.api
+
 from lib.model.smartplugin import SmartPlugin
 
 PLUGIN_ATTR_TOKEN		= 'token'
